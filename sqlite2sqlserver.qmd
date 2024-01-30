@@ -1,0 +1,53 @@
+---
+title: (L)oad Data into SQL Server
+format: html
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import os
+from sqlalchemy import create_engine
+```
+## Read In SQLite Tables
+
+```{python}
+import sqlite3
+# Assuming combined_df is your DataFrame
+# Replace combined_df with the actual name of your DataFrame
+
+# Create a new SQLite database
+conn = sqlite3.connect('./bikeshare.sqlite3')
+
+
+# Run a query to count the number of rows in the table
+query = 'SELECT * FROM rides'
+rides = pd.read_sql_query(query, conn)
+
+
+conn.close()
+```
+```{python}
+# rides.shape
+```
+
+
+## Create Table on  SQL Server
+
+```{python}
+
+```
+```{python}
+
+# Writing DataFrame to SQL Server
+# rides.to_sql('rides', con=engine, if_exists='replace', index=False)
+
+# Reading the table back into a DataFrame
+df_read = pd.read_sql('SELECT count(*) FROM dealerships', con=engine)
+
+# Display the DataFrame read from the database
+print(df_read)
+
+```

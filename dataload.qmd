@@ -1,0 +1,142 @@
+---
+title: More Bikeshare Fun
+format: html
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import os
+```
+## Extract Method One.
+
+
+## Extract Load Method Three
+
+```{python}
+import pandas as pd
+import glob
+
+# Define the pattern to match the CSV files
+pattern = 'data/*.csv'
+
+# Use glob to create a list of file paths
+file_paths = glob.glob(pattern)
+
+# Read and store all CSV files into a list of DataFrames
+dataframes = [pd.read_csv(file) for file in file_paths]
+
+# Combine all DataFrames into one
+combined_df = pd.concat(dataframes, ignore_index=True)
+combined_df.shape
+```
+```{python}
+combined_df.drop_duplicates(inplace=True)
+combined_df.shape
+```
+
+```{python}
+combined_df = combined_df[combined_df['start_station_name'].notna()]
+
+# Remove rows where 'start_station_name' is an empty string or contains only whitespace
+combined_df = combined_df[combined_df['start_station_name'].str.strip() != '']
+combined_df.shape
+```
+
+## Extract Dates from started_at and Ended_at only keep rows where start_date and end_date are the same.
+
+```{python} 
+
+# Assuming df is your DataFrame and it has columns 'started_at' and 'ended_at'
+# Replace df with the actual name of your DataFrame
+
+# Convert 'started_at' and 'ended_at' to datetime if they are not already
+combined_df['started_at'] = pd.to_datetime(combined_df['started_at'])
+combined_df['ended_at'] = pd.to_datetime(combined_df['ended_at'])
+
+# Extract just the date part and create new columns 'start_date' and 'end_date'
+combined_df['start_date'] = combined_df['started_at'].dt.date
+combined_df['end_date'] = combined_df['ended_at'].dt.date
+
+# Keep only rows where 'start_date' and 'end_date' are the same
+combined_df = combined_df[combined_df['start_date'] == combined_df['end_date']]
+
+# Now df will have only the rows where 'start_date' and 'end_date' match
+
+```
+```{python}
+combined_df.dtypes
+```
+```{python}
+
+# Assuming combined_df is your DataFrame
+# Replace combined_df with the actual name of your DataFrame
+
+# Convert 'started_at' and 'ended_at' to datetime if not already
+combined_df['started_at'] = pd.to_datetime(combined_df['started_at'], errors='coerce')
+combined_df['ended_at'] = pd.to_datetime(combined_df['ended_at'], errors='coerce')
+
+# Drop rows where either 'started_at' or 'ended_at' is NaT
+combined_df.dropna(subset=['started_at', 'ended_at'], inplace=True)
+
+# Calculate trip duration in hours
+combined_df['trip_duration'] = (combined_df['ended_at'] - combined_df['started_at']) / pd.Timedelta(hours=1)
+
+# Filter out rows where trip duration is less than or equal to 0
+combined_df = combined_df[combined_df['trip_duration'] > 0]
+
+
+## Calculate Trip Duration and Keep rows where Trip Duratoin is Greater than Zero
+# combined_df.shape   
+```
+
+
+## Split data frame  into chucks
+
+```{python}
+import pandas as pd
+
+# Assuming combined_df is your DataFrame
+num_chunks = 10
+chunk_size = len(combined_df) // num_chunks
+
+chunks = [combined_df[i:i + chunk_size] for i in range(0, len(combined_df), chunk_size)]
+```
+
+```{[python]}
+import pandas as pd
+import numpy as np
+
+# Assuming combined_df is your DataFrame
+num_chunks = 10
+chunks = np.array_split(combined_df, num_chunks)
+
+# Writing each chunk to a separate CSV file
+for i, chunk in enumerate(chunks):
+    chunk.to_csv(f'chunk_{i+1}.csv', index=False)
+```
+# Create 10 CSV files.
+
+```{python}
+import pandas as pd
+import numpy as np
+import os
+
+# Assuming combined_df is your DataFrame
+num_chunks = 10
+chunks = np.array_split(combined_df, num_chunks)
+
+# Directory where CSV files will be stored
+directory = 'datachunks'
+
+# Create the directory if it doesn't exist
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+# Writing each chunk to a separate CSV file in the specified directory
+for i, chunk in enumerate(chunks):
+    file_path = os.path.join(directory, f'chunk_{i+1}.csv')
+    chunk.to_csv(file_path, index=False)
+```

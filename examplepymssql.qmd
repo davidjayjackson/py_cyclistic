@@ -1,0 +1,43 @@
+---
+title: Pull DimStations
+format: html
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as pd
+import matplotlib as plt
+import seaborn as sns
+import pymssql
+```
+# Contnect to SQL Server
+
+```{python}
+# Define your connection parameters
+server = 'localhost/DAVESDATA'
+user = 'admin'
+password = '123456'
+database= 'cyclistic'
+# Establish a connection to the SQL Server
+conn = pymssql.connect(server, user, password, database)
+
+```
+```{python}
+# Create a cursor from the connection
+cursor = conn.cursor()
+```
+# Pull Some Data from DimStations Table
+
+```{python}
+# Execute a query
+cursor.execute('SELECT * FROM DimStations')
+
+# Fetch and print the results
+for row in cursor:
+    print(row)
+
+# Close the connection
+cursor.close()
+conn.close()
+```

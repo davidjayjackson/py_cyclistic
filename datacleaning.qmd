@@ -1,0 +1,100 @@
+---
+title: More Bikeshare Fun
+format: html
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import os
+```
+=================================================================================================
+# (E)xtract Data
+# 
+## Read In 12 Monthly Ride Files
+=================================================================================================
+## 1. Using pandas.concat()
+This method is suitable when all CSV files have the same structure (i.e., same columns).
+
+```{python}
+
+import glob
+
+# Define the pattern to match the CSV files
+pattern = 'data/*.csv'
+
+# Use glob to create a list of file paths
+file_paths = glob.glob(pattern)
+
+# Read and store all CSV files into a list of DataFrames
+dataframes = [pd.read_csv(file) for file in file_paths]
+
+# Combine all DataFrames into one
+combined_df = pd.concat(dataframes, ignore_index=True)
+
+# Optional: Remove duplicate rows if they exist
+combined_df.shape
+combined_df.drop_duplicates(inplace=True)
+combined_df.shape
+
+```
+============================================================================================
+# (T)ransform
+============================================================================================
+ 
+```{python}
+## Remove rows missing start_station_name
+
+
+# Assuming df is your DataFrame
+# Replace df with the actual name of your DataFrame
+
+# Remove rows where 'start_station_name' is NaN
+combined_df = combined_df[combined_df['start_station_name'].notna()]
+
+# Remove rows where 'start_station_name' is an empty string or contains only whitespace
+combined_df = combined_df[combined_df['start_station_name'].str.strip() != '']
+
+# Now df will have rows removed where 'start_station_name' was either blank or NaN
+combined_df.shape
+```
+
+## verify start_at and end_at columns type 
+
+```{python}
+
+
+# Assuming df is your DataFrame and it has columns 'started_at' and 'ended_at'
+# Replace df with the actual name of your DataFrame
+
+# Convert 'started_at' to datetime
+combined_df['started_at'] = pd.to_datetime(combined_df['started_at'])
+
+# Convert 'ended_at' to datetime
+combined_df['ended_at'] = pd.to_datetime(combined_df['ended_at'])
+
+# Now both 'started_at' and 'ended_at' are in datetime format
+combined_df.shape
+```
+## Extract start date and end dates from started_at and ended_at 
+
+```{python}
+# Extract date from 'started_at' and create a new column 'start_date'
+combined_df['start_date'] = combined_df['started_at'].dt.date
+
+# Extract date from 'ended_at' and create a new column 'end_date'
+combined_df['end_date'] = combined_df['ended_at'].dt.date
+combined_df.shape   
+```
+
+## Remove rides where start_date and end_date aren't the same.
+
+
+```{python}
+combined_df.shape
+# Keep only the rows where 'start_date' and 'end_date' are the same
+combined_df = combined_df[combined_df['start_date'] == combined_df['end_date']]
+combined_df.shape
+```

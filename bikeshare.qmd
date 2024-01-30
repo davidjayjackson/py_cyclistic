@@ -1,0 +1,67 @@
+---
+title: More Bikeshare Fun
+format: html
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import os
+```
+## Read In 12 Monthly Ride Files
+
+```{python}
+import pandas as pd
+import os
+
+# Path to the directory containing CSV files
+directory = 'data'
+
+# Initialize an empty list to store DataFrames
+dataframes = []
+
+# Loop through each file in the directory
+for filename in os.listdir(directory):
+    if filename.endswith('.csv'):
+        # Construct full file path
+        filepath = os.path.join(directory, filename)
+        # Read the CSV file and append to the list
+        dataframes.append(pd.read_csv(filepath))
+
+# Combine all DataFrames into one
+bikerides = pd.concat(dataframes, ignore_index=True)
+
+bikerides.size
+bikerides.dtypes
+```
+```{python}
+# Remove rows where 'start_station_name' is NaN (missing)
+bikerides = bikerides.dropna(subset=['start_station_name'])
+
+# Further remove rows where 'start_station_name' is an empty string
+bikerides = bikerides[bikerides['start_station_name'] != '']
+bikerides.size
+```
+
+```{python}
+import pandas as pd
+
+# Assuming bikerides is your existing DataFrame
+
+# Convert 'started_at' and 'ended_at' to datetime
+bikerides['started_at'] = pd.to_datetime(bikerides['started_at'])
+bikerides['ended_at'] = pd.to_datetime(bikerides['ended_at'])
+
+# Extract the date part
+bikerides['start_date'] = bikerides['started_at'].dt.date
+bikerides['end_date'] = bikerides['ended_at'].dt.date
+bikerides.dtypes
+```
+```{python}
+# Keep only rows where start_date equals end_date
+rides = bikerides[bikerides['start_date'] == bikerides['end_date']]
+
+
+```
