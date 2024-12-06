@@ -20,6 +20,10 @@ rides = duckdb.sql(query).df()
 
 rides.isnull().sum()
 
+# Size of DF
+
+rides.shape
+
 # Remvoe Rides Missing Station Names.
 
 rides = rides.dropna(subset=['start_station_name', 'end_station_name'])
@@ -53,17 +57,26 @@ cleaned = filtered_df.copy()
 ```
 # Calculate Trip Duration in minutes.
 
-
 ```{python}
 # Calculate trip duration in minutes
-rides['trip_duration_minutes'] = (rides['ended_at'] - rides['started_at']).dt.total_seconds() / 60
+cleaned['trip_duration_minutes'] = (cleaned['ended_at'] - cleaned['started_at']).dt.total_seconds() / 60
 
 # Validate the calculation
-print(rides[['started_at', 'ended_at', 'trip_duration_minutes']].head())
+print(cleaned[['started_at', 'ended_at', 'trip_duration_minutes']].head())
 
 # Check for any negative durations (invalid data)
-negative_durations = rides[rides['trip_duration_minutes'] < 0]
+negative_durations = cleaned[cleaned['trip_duration_minutes'] < 0]
 print(f"Number of trips with negative duration: {negative_durations.shape[0]}")
 
-# rides[['trip_duration_minutes']].describe()
+
+```
+# Shape of things to  come:
+
+```{python}
+cleaned.shape
+```
+# Describe Rides DataFrame
+
+```{python}
+cleaned[['trip_duration_minutes']].describe()
 ```
