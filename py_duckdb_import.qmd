@@ -8,8 +8,8 @@ jupyther: python3
 import duckdb
 import pandas as pd
 import numpy as np
-# import seaborn as sns
-# import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 query = """
@@ -80,3 +80,27 @@ cleaned.shape
 ```{python}
 cleaned[['trip_duration_minutes']].describe()
 ```
+# Plot Rides Counts
+
+```{python}
+# Count rides by day
+rides_by_day = cleaned.groupby('start_date').size().reset_index(name='ride_count')
+
+# Sort by date (if not already sorted)
+rides_by_day = rides_by_day.sort_values(by='start_date')
+
+# Plot using Seaborn
+sns.set(style="whitegrid")
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=rides_by_day, x='start_date', y='ride_count', marker='o', label="Rides by Day")
+
+# Customize plot
+plt.title("Rides by Day", fontsize=16)
+plt.xlabel("Date", fontsize=12)
+plt.ylabel("Ride Count", fontsize=12)
+plt.xticks(rotation=45)
+plt.legend()
+plt.tight_layout()
+
+# Show the plot
+plt.show()
